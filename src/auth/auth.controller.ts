@@ -7,6 +7,7 @@ import {
   Request,
   Res,
   HttpStatus,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
@@ -14,6 +15,7 @@ import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { CreateUserDto } from '../users/dto/create-user.dto';
+import { LoginDto } from './dto/login.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -21,13 +23,48 @@ export class AuthController {
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@Request() req) {
-    return this.authService.login(req.user);
+  async login(
+    @Body() loginDto: LoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const user = await this.authService.validateUser(
+      loginDto.username,
+      loginDto.password,
+    );
+    if (!user) {
+      throw new UnauthorizedException('Invalid username or password');
+    }
+
+    const { access_token, user: userData } = this.authService.login(user);
+
+    // Setting the cookie with the token
+    res.cookie('access_token', access_token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+
+    return userData;
   }
 
   @Post('register')
-  async register(@Body() createUserDto: CreateUserDto) {
-    return this.authService.register(createUserDto);
+  async register(
+    @Body() createUserDto: CreateUserDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const newUser = await this.authService.register(createUserDto);
+
+    const { access_token, user } = this.authService.login(newUser);
+
+    res.cookie('access_token', access_token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+
+    return user;
   }
 
   // start of google auth
@@ -41,11 +78,16 @@ export class AuthController {
   googleAuthRedirect(@Request() req, @Res() res: Response) {
     const { access_token, user } = this.authService.googleLogin(req.user);
 
-    // אפשרות 1: הפניה לפרונטאנד עם הטוקן
-    return res.redirect(`http://your-frontend-url?token=${access_token}`);
+    // Setting the cookie with the token
+    res.cookie('access_token', access_token, {
+      httpOnly: true, // Only the server can read the cookie.
+      secure: true, // The cookie only works in HTTPS.
+      sameSite: 'lax', // Protects against CSRF attacks.
+      maxAge: 24 * 60 * 60 * 1000, // Cookie expires in 1 day.
+    });
 
-    // אפשרות 2: החזרת JSON
-    // return res.status(HttpStatus.OK).json({ access_token, user });
+    // redirect to frontend
+    return res.redirect('http://your-frontend-url');
   }
 
   @UseGuards(JwtAuthGuard)

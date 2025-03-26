@@ -3,6 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from '../../users/users.service';
+import { Request } from 'express';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -11,7 +12,18 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     private configService: ConfigService,
   ) {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        // Check if the token is sent in the header HTTP Authorization
+        ExtractJwt.fromAuthHeaderAsBearerToken(),
+        // Check if the token is sent in the cookie
+        (request: Request) => {
+          const cookie = request.cookies?.access_token;
+          if (!cookie) {
+            return null;
+          }
+          return cookie;
+        },
+      ]),
       ignoreExpiration: false,
       secretOrKey: configService.get<string>('JWT_SECRET') || 'your-secret-key',
     });

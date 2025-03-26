@@ -1,17 +1,16 @@
 import {
   IsEmail,
   IsString,
-  IsNotEmpty,
-  MinLength,
   IsOptional,
+  MinLength,
   Matches,
 } from 'class-validator';
 
-export class CreateUserDto {
-  @IsNotEmpty({ message: 'Username cannot be empty' })
+export class UpdateUserDto {
+  @IsOptional()
   @IsString({ message: 'Username must be a string' })
   @MinLength(3, { message: 'Username must be at least 3 characters long' })
-  readonly username: string;
+  readonly username?: string;
 
   @IsOptional()
   @IsString({ message: 'Password must be a string' })
@@ -22,9 +21,9 @@ export class CreateUserDto {
   })
   readonly password?: string;
 
-  @IsNotEmpty({ message: 'Email cannot be empty' })
+  @IsOptional()
   @IsEmail({}, { message: 'Email format is invalid' })
-  readonly email: string;
+  readonly email?: string;
 
   @IsOptional()
   @IsString({ message: 'First name must be a string' })
@@ -33,10 +32,6 @@ export class CreateUserDto {
   @IsOptional()
   @IsString({ message: 'Last name must be a string' })
   readonly lastName?: string;
-
-  @IsOptional()
-  @IsString({ message: 'Google ID must be a string' })
-  readonly googleId?: string;
 
   @IsOptional()
   @IsString({ message: 'Picture URL must be a string' })
