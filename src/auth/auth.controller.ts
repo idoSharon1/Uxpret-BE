@@ -1,0 +1,98 @@
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  UseGuards,
+  Request,
+  Res,
+  HttpStatus,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { Response } from 'express';
+import { AuthService } from './auth.service';
+import { GoogleAuthGuard } from './guards/google-auth.guard';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { LocalAuthGuard } from './guards/local-auth.guard';
+import { CreateUserDto } from '../users/dto/create-user.dto';
+import { LoginDto } from './dto/login.dto';
+
+@Controller('auth')
+export class AuthController {
+  constructor(private authService: AuthService) {}
+
+  @UseGuards(LocalAuthGuard)
+  @Post('login')
+  async login(
+    @Body() loginDto: LoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const user = await this.authService.validateUser(
+      loginDto.username,
+      loginDto.password,
+    );
+    if (!user) {
+      throw new UnauthorizedException('Invalid username or password');
+    }
+
+    const { access_token, user: userData } = this.authService.login(user);
+
+    // Setting the cookie with the token
+    res.cookie('access_token', access_token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+
+    return userData;
+  }
+
+  @Post('register')
+  async register(
+    @Body() createUserDto: CreateUserDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const newUser = await this.authService.register(createUserDto);
+
+    const { access_token, user } = this.authService.login(newUser);
+
+    res.cookie('access_token', access_token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+
+    return user;
+  }
+
+  // start of google auth
+  @Get('google')
+  @UseGuards(GoogleAuthGuard)
+  async googleAuth() {}
+
+  //Google (callback)
+  @Get('google/callback')
+  @UseGuards(GoogleAuthGuard)
+  googleAuthRedirect(@Request() req, @Res() res: Response) {
+    const { access_token, user } = this.authService.googleLogin(req.user);
+
+    // Setting the cookie with the token
+    res.cookie('access_token', access_token, {
+      httpOnly: true, // Only the server can read the cookie.
+      secure: true, // The cookie only works in HTTPS.
+      sameSite: 'lax', // Protects against CSRF attacks.
+      maxAge: 24 * 60 * 60 * 1000, // Cookie expires in 1 day.
+    });
+
+    // redirect to frontend
+    return res.redirect('http://your-frontend-url');
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('profile')
+  getProfile(@Request() req) {
+    return req.user;
+  }
+}
