@@ -12,7 +12,9 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ReportParamDto } from './dto/report-param.dto';
 import { ReportHistoryQueryDto } from './dto/report-history-query.dto';
 import { ReportCompareQueryDto } from './dto/report-compare-query.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('reports') // Groups endpoints under "users"
 @Controller('api/reports')
 @UseGuards(JwtAuthGuard)
 export class ReportsController {
