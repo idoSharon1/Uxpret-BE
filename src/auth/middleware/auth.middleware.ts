@@ -20,6 +20,7 @@ export class AuthMiddleware implements NestMiddleware {
   async use(req: Request, res: Response, next: NextFunction) {
     // List of paths that do not require matching
     const publicPaths = [
+      '/',
       '/api/website/analyze',
       '/auth/login',
       '/auth/register',
