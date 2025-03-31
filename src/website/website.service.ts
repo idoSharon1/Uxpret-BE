@@ -90,9 +90,7 @@ export class WebsiteService {
         content,
         options.deepAnalysis,
       );
-
-      console.log({analysisResults});
-
+      
       // TDOD
       // // 5. Generate PDF report
       // const pdfUrl = await this.generatePdfReport(
@@ -130,7 +128,6 @@ export class WebsiteService {
       const evaluation_json = convertApiResponse(res);
       console.log('AI Analysis response:');
       log({evaluation_json: evaluation_json});
-
       return evaluation_json;
     }).catch((error) => {
       console.error('Error during AI analysis:', error);
