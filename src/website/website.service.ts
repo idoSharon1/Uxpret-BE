@@ -5,6 +5,9 @@ import { Model } from 'mongoose';
 import { AnalyzeWebsiteDto } from './dto/analyze-website.dto';
 import { Report, ReportDocument } from '../reports/schemas/report.schema';
 import { UsersService } from '../users/users.service';
+import { fetchWebsiteContent, validateUrl } from './utils/website';
+import { convertApiResponse, getWebsiteGemeniAnalysis } from './utils/Gemini';
+import { log } from 'console';
 
 @Injectable()
 export class WebsiteService {
@@ -20,7 +23,7 @@ export class WebsiteService {
       this.logger.log(`Starting analysis for URL: ${analyzeWebsiteDto.url}`);
 
       // 1. Validate the URL is accessible
-      await this.validateUrl(analyzeWebsiteDto.url);
+      await validateUrl(analyzeWebsiteDto.url);
 
       // 2. Create a new report entry with status "processing"
       const report = new this.reportModel({
@@ -63,18 +66,6 @@ export class WebsiteService {
     }
   }
 
-  private async validateUrl(url: string): Promise<void> {
-    try {
-      // Basic check if the URL is accessible
-      const response = await fetch(url, { method: 'HEAD' });
-      if (!response.ok) {
-        throw new Error(`URL returned status ${response.status}`);
-      }
-    } catch (error) {
-      throw new Error(`URL validation failed: ${error.message}`);
-    }
-  }
-
   private async processWebsiteAnalysis(
     reportId: string,
     options: AnalyzeWebsiteDto,
@@ -84,13 +75,14 @@ export class WebsiteService {
       await this.updateReportStatus(reportId, 'analyzing');
 
       // 2. Fetch the website content
-      const content = await this.fetchWebsiteContent(options.url);
+      const content = (await fetchWebsiteContent(options.url)).toString();
 
-      // 3. Take screenshots if requested
-      let screenshots: string[] = [];
-      if (options.includeScreenshots) {
-        screenshots = await this.captureScreenshots(options.url);
-      }
+      // TODO
+      // // 3. Take screenshots if requested
+      // let screenshots: string[] = [];
+      // if (options.includeScreenshots) {
+      //   screenshots = await this.captureScreenshots(options.url);
+      // }
 
       // 4. Perform AI analysis
       // integrate with AI  service
@@ -98,20 +90,25 @@ export class WebsiteService {
         content,
         options.deepAnalysis,
       );
+      
+      // TDOD
+      // // 5. Generate PDF report
+      // const pdfUrl = await this.generatePdfReport(
+      //   reportId,
+      //   analysisResults,
+      //   screenshots,
+      // );
 
-      // 5. Generate PDF report
-      const pdfUrl = await this.generatePdfReport(
-        reportId,
-        analysisResults,
-        screenshots,
-      );
-
-      // 6. Update report with results
-      await this.updateReportStatus(reportId, 'completed', {
-        results: analysisResults,
-        pdfUrl,
-        completedAt: new Date(),
-      });
+      if (analysisResults == null) {
+        throw new BadRequestException('AI analysis failed');
+      } else { 
+        // 6. Update report with results
+        await this.updateReportStatus(reportId, 'completed', {
+          results: analysisResults.website_evaluation,
+          pdfUrl: "", //pdfUrl,
+          completedAt: new Date(),
+        });
+      }
     } catch (error) {
       // Update report with error status
       await this.updateReportStatus(reportId, 'failed', {
@@ -119,6 +116,23 @@ export class WebsiteService {
       });
       throw error;
     }
+  }
+
+  private async performAiAnalysis(
+    content: string,
+    deepAnalysis: boolean = false,
+  ): Promise<any> {
+
+    return getWebsiteGemeniAnalysis(content).then((response) => {
+      const res = response.candidates[0].content.parts[0].text;
+      const evaluation_json = convertApiResponse(res);
+      console.log('AI Analysis response:');
+      log({evaluation_json: evaluation_json});
+      return evaluation_json;
+    }).catch((error) => {
+      console.error('Error during AI analysis:', error);
+      return null
+    });
   }
 
   private async updateReportStatus(
@@ -133,15 +147,6 @@ export class WebsiteService {
     });
   }
 
-  private async fetchWebsiteContent(url: string): Promise<string> {
-    try {
-      const response = await fetch(url);
-      return await response.text();
-    } catch (error) {
-      throw new Error(`Failed to fetch website content: ${error.message}`);
-    }
-  }
-
   private async captureScreenshots(url: string): Promise<string[]> {
     this.logger.log(`Capturing screenshots for ${url}`);
     await Promise.resolve();
@@ -149,53 +154,6 @@ export class WebsiteService {
       'https://your-storage-service.com/screenshots/screenshot1.png',
       'https://your-storage-service.com/screenshots/screenshot2.png',
     ];
-  }
-
-  private async performAiAnalysis(
-    content: string,
-    deepAnalysis: boolean = false,
-  ): Promise<any> {
-    // This is where you would integrate with your AI service
-    // For example, OpenAI API or your custom ML model
-    this.logger.log(
-      `Performing ${deepAnalysis ? 'deep' : 'standard'} AI analysis`,
-    );
-
-    // Simulating AI analysis with a delay
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-
-    return {
-      seo: {
-        score: 85,
-        suggestions: ['Add meta descriptions', 'Improve heading structure'],
-      },
-      accessibility: {
-        score: 72,
-        suggestions: ['Add alt text to images', 'Improve contrast ratio'],
-      },
-      performance: {
-        score: 90,
-        suggestions: ['Optimize image sizes', 'Enable caching'],
-      },
-      usability: {
-        score: 80,
-        suggestions: ['Improve mobile navigation', 'Enhance form usability'],
-      },
-      // Additional data if deep analysis was requested
-      ...(deepAnalysis
-        ? {
-            contentQuality: {
-              score: 78,
-              suggestions: ['Reduce duplicate content', 'Improve readability'],
-            },
-            competitiveAnalysis: {
-              rank: 'Medium',
-              strengths: ['Good performance', 'Clear navigation'],
-              weaknesses: ['Limited content', 'Few backlinks'],
-            },
-          }
-        : {}),
-    };
   }
 
   private async generatePdfReport(

@@ -2,7 +2,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Report, ReportDocument } from './schemas/report.schema';
+import { OverallEvaluation, Report, ReportDocument, WebsiteEvaluation } from './schemas/report.schema';
 
 @Injectable()
 export class ReportsService {
@@ -87,8 +87,7 @@ export class ReportsService {
       throw new NotFoundException(`Report with ID "${reportId2}" not found`);
     }
 
-    // for Ido - Should we carry out an in-depth comparison of the analysis results here?
-    //
+    this.compareCategory(report1.results.category_ratings , report2.results.category_ratings)
 
     return {
       report1: {
@@ -103,24 +102,7 @@ export class ReportsService {
         name: report2.name,
         results: report2.results,
       },
-      comparisons: {
-        seo: this.compareScores(
-          report1.results?.seo?.score,
-          report2.results?.seo?.score,
-        ),
-        accessibility: this.compareScores(
-          report1.results?.accessibility?.score,
-          report2.results?.accessibility?.score,
-        ),
-        performance: this.compareScores(
-          report1.results?.performance?.score,
-          report2.results?.performance?.score,
-        ),
-        usability: this.compareScores(
-          report1.results?.usability?.score,
-          report2.results?.usability?.score,
-        ),
-      },
+      comparisons: this.compareCategory(report1.results.category_ratings , report2.results.category_ratings),
     };
   }
 
@@ -137,5 +119,26 @@ export class ReportsService {
       percentageDifference: ((difference / score2) * 100).toFixed(1) + '%',
       better: difference > 0 ? 'report1' : difference < 0 ? 'report2' : 'equal',
     };
+  }
+
+  private compareCategory(report1Categories: WebsiteEvaluation[], report2Categories: WebsiteEvaluation[]): any {
+    if (!report1Categories || !report1Categories) {
+      return { comparable: false };
+    }
+
+    let results: {category: string, numeric_rating:number}[] = [];
+
+    for (const cat1 in report1Categories) {
+      for (const cat2 in report2Categories) {
+        if (cat1["category"] == cat2["category"]) {
+          results[cat1["category"]] = {
+            category: cat1["category"],
+            numeric_rating: cat2["numeric_rating"] - cat1["numeric_rating"],
+          };
+        }
+      }
+    }
+    
+    return results
   }
 }
