@@ -10,25 +10,27 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     private authService: AuthService,
     private configService: ConfigService,
   ) {
-    const clientID = configService.get<string>('GOOGLE_CLIENT_ID');
-    const clientSecret = configService.get<string>('GOOGLE_CLIENT_SECRET');
-    const callbackURL =
+    const currentClientID = configService.get<string>('GOOGLE_CLIENT_ID');
+    const currentClientSecret = configService.get<string>('GOOGLE_CLIENT_SECRET');
+    const callback =
       configService.get<string>('GOOGLE_CALLBACK_URL') ||
       'http://localhost:3000/auth/google/callback';
 
-    if (!clientID || !clientSecret) {
+    if (!currentClientID || !currentClientSecret) {
       throw new Error('Missing Google OAuth credentials');
     }
 
     super({
-      clientID,
-      clientSecret,
-      callbackURL,
+      clientID: currentClientID,
+      clientSecret: currentClientSecret,
+      callbackURL: callback,
       scope: ['email', 'profile'],
+      passReqToCallback: true
     });
   }
 
   async validate(
+    req: Request,
     accessToken: string,
     refreshToken: string,
     profile: Profile,

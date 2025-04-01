@@ -58,9 +58,6 @@ export class AuthController {
     const { access_token, user } = this.authService.login(newUser);
 
     res.cookie('access_token', access_token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'lax',
       maxAge: 24 * 60 * 60 * 1000,
     });
 
@@ -77,17 +74,14 @@ export class AuthController {
   @UseGuards(GoogleAuthGuard)
   googleAuthRedirect(@Request() req, @Res() res: Response) {
     const { access_token, user } = this.authService.googleLogin(req.user);
-
+    console.log("asfasfasf")
     // Setting the cookie with the token
     res.cookie('access_token', access_token, {
-      httpOnly: true, // Only the server can read the cookie.
-      secure: true, // The cookie only works in HTTPS.
-      sameSite: 'lax', // Protects against CSRF attacks.
       maxAge: 24 * 60 * 60 * 1000, // Cookie expires in 1 day.
     });
 
     // redirect to frontend
-    return res.redirect('http://your-frontend-url');
+    return res.redirect(process.env.FRONTEND_URL || 'http://localhost:3000');
   }
 
   @UseGuards(JwtAuthGuard)
