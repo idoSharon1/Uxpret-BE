@@ -20,7 +20,7 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document); // Swagger will be available at /api  
+  SwaggerModule.setup('api', app, document); // Swagger will be available at /api
 
   // Enable global validation
   app.useGlobalPipes(
@@ -36,7 +36,7 @@ async function bootstrap() {
   // Enable CORS for frontend integration
   app.enableCors({
     origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-    credentials: true
+    credentials: true,
   });
 
   await app.listen(process.env.PORT || 3000);
