@@ -34,7 +34,10 @@ async function bootstrap() {
   // Enable cookie parser
   app.use(cookieParser());
   // Enable CORS for frontend integration
-  app.enableCors();
+  app.enableCors({
+    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    credentials: true
+  });
 
   await app.listen(process.env.PORT || 3000);
   console.log(`Application is running on: ${await app.getUrl()}`);

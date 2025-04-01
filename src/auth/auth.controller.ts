@@ -27,8 +27,9 @@ export class AuthController {
     @Body() loginDto: LoginDto,
     @Res({ passthrough: true }) res: Response,
   ) {
+
     const user = await this.authService.validateUser(
-      loginDto.username,
+      loginDto.email,
       loginDto.password,
     );
     if (!user) {
@@ -39,9 +40,6 @@ export class AuthController {
 
     // Setting the cookie with the token
     res.cookie('access_token', access_token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'lax',
       maxAge: 24 * 60 * 60 * 1000,
     });
 
