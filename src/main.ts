@@ -3,14 +3,28 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
 import * as dotenv from 'dotenv';
 
 async function bootstrap() {
   // Load environment variables
   dotenv.config();
 
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  // Set global prefix
+  app.setGlobalPrefix('api');
+
+  // Serve static files
+  app.useStaticAssets(join(__dirname, '..', 'uploads'), {
+    prefix: '/uploads/',
+  });
+
+  app.enableCors({
+    origin: process.env.FRONTEND_URL || 'http://localhost:3000', // Allow requests from the frontend
+    credentials: true, // Allow cookies to be sent
+  });
 
   const config = new DocumentBuilder()
     .setTitle('UXpert API')
@@ -20,7 +34,7 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document); // Swagger will be available at /api  
+  SwaggerModule.setup('api', app, document); // Swagger will be available at /api
 
   // Enable global validation
   app.useGlobalPipes(

@@ -7,6 +7,7 @@ import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { User } from '../users/schemas/user.schema';
+import { first } from 'rxjs';
 
 @Injectable()
 export class AuthService {
@@ -42,6 +43,9 @@ export class AuthService {
         userId: user._id,
         username: user.username,
         email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        picture: user.picture,
       },
     };
   }
@@ -112,6 +116,21 @@ export class AuthService {
     }
 
     return user!;
+  }
+
+  async validateUserByEmail(email: string, password: string): Promise<any> {
+    const user = await this.usersService.findByEmail(email);
+
+    if (
+      user &&
+      user.password &&
+      (await bcrypt.compare(password, user.password))
+    ) {
+      const userObj = (user as any).toObject ? (user as any).toObject() : user;
+      const { password, ...result } = userObj;
+      return result;
+    }
+    return null;
   }
 
   googleLogin(user: any) {

@@ -8,6 +8,9 @@ import {
   Res,
   HttpStatus,
   UnauthorizedException,
+  UseInterceptors,
+  BadRequestException,
+  UploadedFile as NestUploadedFile,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
@@ -16,6 +19,8 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
 
 @Controller('auth')
 export class AuthController {
@@ -28,11 +33,11 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const user = await this.authService.validateUser(
-      loginDto.username,
+      loginDto.email,
       loginDto.password,
     );
     if (!user) {
-      throw new UnauthorizedException('Invalid username or password');
+      throw new UnauthorizedException('Invalid email or password');
     }
 
     const { access_token, user: userData } = this.authService.login(user);
@@ -45,15 +50,53 @@ export class AuthController {
       maxAge: 24 * 60 * 60 * 1000,
     });
 
-    return userData;
+    return {
+      token: access_token,
+      user: userData,
+    };
   }
 
   @Post('register')
+  @UseInterceptors(
+    FileInterceptor('profileImage', {
+      storage: diskStorage({
+        destination: './uploads/profiles',
+        filename: (req, file, cb) => {
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          cb(null, '${uniqueSuffix}-${file.originalname}');
+        },
+      }),
+      fileFilter: (req, file, cb) => {
+        if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
+          return cb(
+            new BadRequestException('Only image files are allowed!'),
+            false,
+          );
+        }
+        cb(null, true);
+      },
+      limits: {
+        fileSize: 5 * 1024 * 1024, // 5MB
+      },
+    }),
+  )
   async register(
     @Body() createUserDto: CreateUserDto,
+    @UploadedFile() profileImage: Express.Multer.File,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const newUser = await this.authService.register(createUserDto);
+    // Add profile image path to user data if a file was uploaded
+    let userData = createUserDto;
+
+    if (profileImage) {
+      userData = {
+        ...createUserDto,
+        picture: '/uploads/profiles/${profileImage.filename}',
+      };
+    }
+
+    const newUser = await this.authService.register(userData);
 
     const { access_token, user } = this.authService.login(newUser);
 
@@ -64,7 +107,10 @@ export class AuthController {
       maxAge: 24 * 60 * 60 * 1000,
     });
 
-    return user;
+    return {
+      token: access_token,
+      user,
+    };
   }
 
   // start of google auth
@@ -87,7 +133,7 @@ export class AuthController {
     });
 
     // redirect to frontend
-    return res.redirect('http://your-frontend-url');
+    return res.redirect('http://localhost:3000');
   }
 
   @UseGuards(JwtAuthGuard)
@@ -95,4 +141,18 @@ export class AuthController {
   getProfile(@Request() req) {
     return req.user;
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('verify')
+  verifyToken(@Request() req, @Res() res: Response) {
+    return {
+      valid: true,
+      user: req.user,
+    };
+  }
+}
+
+// Helper function for file uploads
+function UploadedFile() {
+  return NestUploadedFile();
 }
