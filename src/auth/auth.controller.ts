@@ -78,7 +78,10 @@ export class AuthController {
       maxAge: 24 * 60 * 60 * 1000, // Cookie expires in 1 day.
     });
 
-    // redirect to frontend
+    res.cookie('user', JSON.stringify(user), {
+      maxAge: 24 * 60 * 60 * 1000, // Cookie expires in 1 day.
+    });
+    
     return res.redirect(process.env.FRONTEND_URL || 'http://localhost:3000');
   }
 
