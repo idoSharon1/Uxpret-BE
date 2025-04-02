@@ -100,6 +100,9 @@ export class WebsiteService {
       //   screenshots,
       // );
 
+      // TDOD
+      // // 6. Generate HTML file and expose it 
+
       if (analysisResults == null) {
         throw new BadRequestException('AI analysis failed');
       } else { 
