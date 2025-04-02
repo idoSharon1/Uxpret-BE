@@ -37,7 +37,7 @@ export class WebsiteService {
       await report.save();
 
       // 3. Start the analysis process asynchronously
-      this.processWebsiteAnalysis(report.id, analyzeWebsiteDto).catch(
+      const results = await this.processWebsiteAnalysis(report.id, analyzeWebsiteDto).catch(
         (error) => {
           this.logger.error(
             `Analysis failed for ${analyzeWebsiteDto.url}`,
@@ -50,11 +50,12 @@ export class WebsiteService {
       );
 
       // 4. Return the report ID immediately so the client can poll for updates
-      return {
-        reportId: report._id,
-        status: 'processing',
-        message: 'Analysis has been queued and will be processed shortly',
-      };
+      // return {
+      //   reportId: report._id,
+      //   status: 'processing',
+      //   message: 'Analysis has been queued and will be processed shortly',
+      // };
+      return results;
     } catch (error) {
       this.logger.error(
         `Failed to start analysis for ${analyzeWebsiteDto.url}`,
@@ -69,7 +70,7 @@ export class WebsiteService {
   private async processWebsiteAnalysis(
     reportId: string,
     options: AnalyzeWebsiteDto,
-  ): Promise<void> {
+  ): Promise<any> {
     try {
       // 1. Update status to "analyzing"
       await this.updateReportStatus(reportId, 'analyzing');
@@ -108,6 +109,7 @@ export class WebsiteService {
           pdfUrl: "", //pdfUrl,
           completedAt: new Date(),
         });
+        return analysisResults.website_evaluation;
       }
     } catch (error) {
       // Update report with error status
