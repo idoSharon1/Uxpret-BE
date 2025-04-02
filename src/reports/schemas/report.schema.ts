@@ -60,10 +60,25 @@ export class Report {
   userId: string;
 
   @Prop({ required: true })
+  email: string;
+
+  @Prop({ required: true })
   url: string;
 
   @Prop()
   name: string;
+
+  @Prop()
+  categories: string[];
+
+  @Prop()
+  audience: string[];
+
+  @Prop()
+  emotions: string[];
+
+  @Prop()
+  purpose: string;
 
   @Prop({
     required: true,

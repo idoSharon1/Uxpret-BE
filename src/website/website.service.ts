@@ -18,7 +18,7 @@ export class WebsiteService {
     private usersService: UsersService,
   ) {}
 
-  async analyze(analyzeWebsiteDto: AnalyzeWebsiteDto, userId: string) {
+  async analyze(analyzeWebsiteDto: AnalyzeWebsiteDto, userId: string, email: string) {
     try {
       this.logger.log(`Starting analysis for URL: ${analyzeWebsiteDto.url}`);
 
@@ -28,8 +28,13 @@ export class WebsiteService {
       // 2. Create a new report entry with status "processing"
       const report = new this.reportModel({
         userId,
+        email: email,
         url: analyzeWebsiteDto.url,
-        name: analyzeWebsiteDto.name || analyzeWebsiteDto.url,
+        name: analyzeWebsiteDto.name,
+        categories: analyzeWebsiteDto.categories,
+        audience: analyzeWebsiteDto.audience,
+        emotions: analyzeWebsiteDto.emotions,
+        purpose: analyzeWebsiteDto.purpose,
         status: 'processing',
         createdAt: new Date(),
       });
@@ -89,7 +94,7 @@ export class WebsiteService {
       // integrate with AI  service
       const analysisResults = await this.performAiAnalysis(
         content,
-        options.deepAnalysis,
+        options,
       );
       
       // TDOD
@@ -99,6 +104,9 @@ export class WebsiteService {
       //   analysisResults,
       //   screenshots,
       // );
+
+      // TDOD
+      // // 6. Generate HTML file and expose it 
 
       if (analysisResults == null) {
         throw new BadRequestException('AI analysis failed');
@@ -122,10 +130,10 @@ export class WebsiteService {
 
   private async performAiAnalysis(
     content: string,
-    deepAnalysis: boolean = false,
+    options: AnalyzeWebsiteDto,
   ): Promise<any> {
 
-    return getWebsiteGemeniAnalysis(content).then((response) => {
+    return getWebsiteGemeniAnalysis(content, options).then((response) => {
       const res = response.candidates[0].content.parts[0].text;
       const evaluation_json = convertApiResponse(res);
       console.log('AI Analysis response:');

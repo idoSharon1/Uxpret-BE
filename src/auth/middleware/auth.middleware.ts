@@ -45,7 +45,7 @@ export class AuthMiddleware implements NestMiddleware {
       // Verify the token
       const payload = this.jwtService.verify(token, {
         secret:
-          this.configService.get<string>('JWT_SECRET') || 'your-secret-key',
+          this.configService.get<string>('JWT_SECRET') || process.env.JWT_SECRET,
       });
 
       // Check if the user exists
