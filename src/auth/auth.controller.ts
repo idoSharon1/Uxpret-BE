@@ -27,7 +27,6 @@ export class AuthController {
     @Body() loginDto: LoginDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-
     const user = await this.authService.validateUser(
       loginDto.email,
       loginDto.password,
@@ -72,7 +71,7 @@ export class AuthController {
   @UseGuards(GoogleAuthGuard)
   googleAuthRedirect(@Request() req, @Res() res: Response) {
     const { access_token, user } = this.authService.googleLogin(req.user);
-    console.log("asfasfasf")
+    console.log('asfasfasf');
     // Setting the cookie with the token
     res.cookie('access_token', access_token, {
       maxAge: 24 * 60 * 60 * 1000, // Cookie expires in 1 day.
@@ -82,8 +81,6 @@ export class AuthController {
       maxAge: 24 * 60 * 60 * 1000, // Cookie expires in 1 day.
     });
 
-    
-    
     return res.redirect(process.env.FRONTEND_URL || 'http://localhost:3000');
   }
 
