@@ -35,7 +35,7 @@ async function generateContentWithGemini(prompt: string): Promise<any> {
 export function getWebsiteGemeniAnalysis(content: string): Promise<any> {
     const prompt = `Rate this website HTML and CSS in the file
                     by the categories:
-                    is the color scheme match the website genre?
+                    Color Schema
                     Usability
                     Visual Design
                     Accessibility
@@ -57,7 +57,7 @@ export function getWebsiteGemeniAnalysis(content: string): Promise<any> {
                         "website_evaluation": {
                             "category_ratings": [
                             {
-                                "category": "Is the color scheme match the website genre?",
+                                "category": "Color Schema",
                                 "text_rating": "...",
                                 "numeric_rating": 0,
                                 "improvement_suggestions": [

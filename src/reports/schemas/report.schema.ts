@@ -5,7 +5,7 @@ export type ReportDocument = Report & Document;
 
 
 type WebsiteEvaluationCategory =
-  "Is the color scheme match the website genre?"
+  "Color Schema"
   | "Usability"
   | "Visual Design"
   | "Performance & Speed"
