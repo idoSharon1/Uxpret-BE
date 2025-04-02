@@ -1,3 +1,5 @@
+import { AnalyzeWebsiteDto } from "../dto/analyze-website.dto";
+
 async function generateContentWithGemini(prompt: string): Promise<any> {
     const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
@@ -32,8 +34,18 @@ async function generateContentWithGemini(prompt: string): Promise<any> {
   }
 
 
-export function getWebsiteGemeniAnalysis(content: string): Promise<any> {
+export function getWebsiteGemeniAnalysis(content: string, options: AnalyzeWebsiteDto): Promise<any> {
     const prompt = `Rate this website HTML and CSS in the file
+                    \n
+                    when you analyze the website, please consider the following aspects:
+                    \n
+                    the audience target of the website are: ${options.audience.join(", ")}.
+                    the categories of the website are: ${options.categories.join(", ")}.
+                    the target emotions of the visitors when visiting the website are: ${options.emotions.join(", ")}.
+                    the website purpose is: ${options.purpose}
+                    \n
+                    Please evaluate the website based on the following categories:
+                    \n
                     by the categories:
                     Color Schema
                     Usability
@@ -51,6 +63,7 @@ export function getWebsiteGemeniAnalysis(content: string): Promise<any> {
                     make me a short list of action items on each category listed.
                     add to each action rate how important it and by how much it will improve the category rate.
                     According to the improvement suggestions create new html with css with tailwind, keep the text from the original website and the some of colors.
+                    \n
                     Show the output in the following JSON format:
                     \n
                     {

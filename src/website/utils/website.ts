@@ -1,3 +1,4 @@
+
  export async function validateUrl(url: string) {
     try {
       // Basic check if the URL is accessible

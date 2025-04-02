@@ -71,7 +71,6 @@ export class AuthController {
   @UseGuards(GoogleAuthGuard)
   googleAuthRedirect(@Request() req, @Res() res: Response) {
     const { access_token, user } = this.authService.googleLogin(req.user);
-    console.log('asfasfasf');
     // Setting the cookie with the token
     res.cookie('access_token', access_token, {
       maxAge: 24 * 60 * 60 * 1000, // Cookie expires in 1 day.
