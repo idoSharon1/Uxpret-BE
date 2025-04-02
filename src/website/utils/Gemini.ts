@@ -1,47 +1,50 @@
-import { AnalyzeWebsiteDto } from "../dto/analyze-website.dto";
+import { AnalyzeWebsiteDto } from '../dto/analyze-website.dto';
 
 async function generateContentWithGemini(prompt: string): Promise<any> {
-    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
-  
-    const requestBody = {
-      contents: [
-        {
-          parts: [{ text: prompt }],
-        },
-      ],
-    };
-  
-    try {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestBody),
-      });
-  
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-  
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error('Error generating content:', error);
-      throw error;
+  const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
+
+  const requestBody = {
+    contents: [
+      {
+        parts: [{ text: prompt }],
+      },
+    ],
+  };
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error generating content:', error);
+    throw error;
   }
+}
 
-
-export function getWebsiteGemeniAnalysis(content: string, options: AnalyzeWebsiteDto): Promise<any> {
-    const prompt = `Rate this website HTML and CSS in the file
+export function getWebsiteGemeniAnalysis(
+  content: string,
+  options: AnalyzeWebsiteDto,
+): Promise<any> {
+  console.log(options);
+  const prompt = `Rate this website HTML and CSS in the file
                     \n
                     when you analyze the website, please consider the following aspects:
                     \n
-                    the audience target of the website are: ${options.audience.join(", ")}.
-                    the categories of the website are: ${options.categories.join(", ")}.
-                    the target emotions of the visitors when visiting the website are: ${options.emotions.join(", ")}.
+                    the audience target of the website are: ${options.audience?.join(', ')}.
+                    the categories of the website are: ${options.categories?.join(', ')}.
+                    the target emotions of the visitors when visiting the website are: ${options.emotions?.join(', ')}.
                     the website purpose is: ${options.purpose}
                     \n
                     Please evaluate the website based on the following categories:
@@ -233,19 +236,20 @@ export function getWebsiteGemeniAnalysis(content: string, options: AnalyzeWebsit
                     the website HTML and CSS is:
                     \n
                     ${content}`;
-    return generateContentWithGemini(prompt);
-  }
-    
+  return generateContentWithGemini(prompt);
+}
 
 export function convertApiResponse(apiResponseString: string): any | null {
-    // Remove the ```json and ``` markers
-    const cleanString = apiResponseString.replace(/```json\n/g, '').replace(/```/g, '');
-  
-    try {
-      const apiResponse: any = JSON.parse(cleanString);
-      return apiResponse;
-    } catch (error) {
-      console.error("Error parsing JSON:", error);
-      return null;
-    }
+  // Remove the ```json and ``` markers
+  const cleanString = apiResponseString
+    .replace(/```json\n/g, '')
+    .replace(/```/g, '');
+
+  try {
+    const apiResponse: any = JSON.parse(cleanString);
+    return apiResponse;
+  } catch (error) {
+    console.error('Error parsing JSON:', error);
+    return null;
   }
+}

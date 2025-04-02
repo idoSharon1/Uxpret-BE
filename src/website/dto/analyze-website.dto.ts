@@ -9,8 +9,10 @@ import {
 } from 'class-validator';
 
 export class AnalyzeWebsiteDto {
-
-  @ApiProperty({ example: 'https://www.colman.ac.il/', description: 'Website Url' })
+  @ApiProperty({
+    example: 'https://www.colman.ac.il/',
+    description: 'Website Url',
+  })
   @IsNotEmpty({ message: 'URL cannot be empty' })
   @IsUrl({}, { message: 'Invalid URL format' })
   readonly url: string;
@@ -20,22 +22,34 @@ export class AnalyzeWebsiteDto {
   @IsString({ message: 'Name must be a string' })
   readonly name: string;
 
-  @ApiProperty({ example: '["Programming","Social Media"]', description: 'Website categories' })
+  @ApiProperty({
+    example: '["Programming","Social Media"]',
+    description: 'Website categories',
+  })
   @IsOptional()
   @IsArray({ message: 'categories must be a string array' })
   readonly categories: string[];
 
-  @ApiProperty({ example: '["Adults","Teens"]', description: 'Website audience' })
+  @ApiProperty({
+    example: '["Adults","Teens"]',
+    description: 'Website audience',
+  })
   @IsOptional()
   @IsArray({ message: 'audience must be a string array' })
   readonly audience: string[];
 
-  @ApiProperty({ example: '["Professional", "Security & Trust"]', description: 'Website emotions' })
+  @ApiProperty({
+    example: '["Professional", "Security & Trust"]',
+    description: 'Website emotions',
+  })
   @IsOptional()
   @IsArray({ message: 'emotions must be a string array' })
   readonly emotions: string[];
 
-  @ApiProperty({ example: 'Website for academic studies', description: 'Website name' })
+  @ApiProperty({
+    example: 'Website for academic studies',
+    description: 'Website name',
+  })
   @IsOptional()
   @IsString({ message: 'purpose must be a string' })
   readonly purpose: string;
