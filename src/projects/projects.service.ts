@@ -38,24 +38,8 @@ export class ProjectsService {
       ...createProjectDto,
     });
 
-    createdProject.save();
-
-    //After creating the project, we can analyze the website
-    const analyzeWebsiteDto: AnalyzeWebsiteDto = {
-      url: createProjectDto.url,
-      name: createProjectDto.name,
-      categories: createProjectDto.categories,
-      audience: createProjectDto.audience,
-      emotions: createProjectDto.emotions,
-      purpose: createProjectDto.purpose,
-      includeScreenshots: createProjectDto.includeScreenshots,
-      deepAnalysis: createProjectDto.deepAnalysis,
-      projectId: createdProject._id as string,
-    };
-    
-    // Call the analyze method from the website service
-    // Passing the userId and email from createProjectDto
-    return this.websiteService.analyze(analyzeWebsiteDto, createProjectDto.userId, createProjectDto.email);
+    await createdProject.save();
+    return true;
   }
 
   update(id: ObjectId, updateProjectDto: UpdateProjectDto) {

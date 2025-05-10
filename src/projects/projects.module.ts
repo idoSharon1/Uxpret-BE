@@ -8,7 +8,6 @@ import { WebsiteModule } from 'src/website/website.module';
 @Module({
     imports: [
       MongooseModule.forFeature([{ name: Project.name, schema: ProjectSchema }]),
-      WebsiteModule,
     ],
   controllers: [ProjectsController],
   providers: [ProjectsService],
