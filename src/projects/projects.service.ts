@@ -8,7 +8,7 @@ export class ProjectsService {
     return 'This action adds a new project';
   }
 
-  findAll() {
+  findAllUsersProjects() {
     return `This action returns all projects`;
   }
 
