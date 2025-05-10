@@ -9,6 +9,12 @@ import {
 } from 'class-validator';
 
 export class AnalyzeWebsiteDto {
+  
+  @ApiProperty({ description: 'Website name', required: true })
+  @IsOptional()
+  @IsString({ message: 'the id of the project that the analyst results will be' })
+  projectId: string;
+
   @ApiProperty({
     example: 'https://www.colman.ac.il/',
     description: 'Website Url',

@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsMongoId, IsEmail, IsArray, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsMongoId, IsEmail, IsArray, IsString, IsUrl, IsBoolean } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { ObjectId } from 'mongoose';
 
@@ -6,43 +6,72 @@ export class CreateProjectDto {
   @ApiProperty({ description: 'User ID of the project creator' })
   @IsNotEmpty()
   @IsMongoId()
-  userId: ObjectId;
+  userId: string;
 
   @ApiProperty({ description: 'Email of the project creator' })
   @IsNotEmpty()
   @IsEmail()
   email: string;
 
-  @ApiProperty({ description: 'URL of the project' })
-  @IsNotEmpty()
-  @IsString()
+  @ApiProperty({
+    example: 'https://www.colman.ac.il/',
+    description: 'Website Url',
+  })
+  @IsNotEmpty({ message: 'URL cannot be empty' })
+  @IsUrl({}, { message: 'Invalid URL format' })
   url: string;
 
-  @ApiProperty({ description: 'Name of the project', required: false })
+  @ApiProperty({ example: 'www.colman.ac.il', description: 'Website name', required: false })
   @IsOptional()
-  @IsString()
-  name?: string;
+  @IsString({ message: 'Name must be a string' })
+  name: string;
 
-  @ApiProperty({ description: 'Categories associated with the project', required: false, type: [String] })
+  @ApiProperty({
+    example: '["Programming","Social Media"]',
+    description: 'Website categories',
+    required: false
+  })
   @IsOptional()
-  @IsArray()
+  @IsArray({ message: 'categories must be a string array' })
   @IsString({ each: true })
-  categories?: string[];
+  categories: string[];
 
-  @ApiProperty({ description: 'Target audience of the project', required: false, type: [String] })
+  @ApiProperty({
+    example: '["Adults","Teens"]',
+    description: 'Website audience',
+    required: false
+  })
   @IsOptional()
-  @IsArray()
+  @IsArray({ message: 'audience must be a string array' })
   @IsString({ each: true })
-  audience?: string[];
+  audience: string[];
 
-  @ApiProperty({ description: 'Emotions associated with the project', required: false, type: [String] })
+  @ApiProperty({
+    example: '["Professional", "Security & Trust"]',
+    description: 'Website emotions',
+    required: false
+  })
   @IsOptional()
-  @IsArray()
+  @IsArray({ message: 'emotions must be a string array' })
   @IsString({ each: true })
-  emotions?: string[];
+  emotions: string[];
 
-  @ApiProperty({ description: 'Purpose of the project', required: false })
+  @ApiProperty({
+    example: 'Website for academic studies',
+    description: 'Website purpose',
+    required: false
+  })
   @IsOptional()
-  @IsString()
-  purpose?: string;
+  @IsString({ message: 'purpose must be a string' })
+  purpose: string;
+
+  @ApiProperty({ example: 'false', description: 'to include screenshot?', required: false })
+  @IsOptional()
+  @IsBoolean({ message: 'Include screenshots must be a boolean' })
+  includeScreenshots?: boolean;
+
+  @ApiProperty({ example: 'false', description: 'to run Deep Analysis?', required: false })
+  @IsOptional()
+  @IsBoolean({ message: 'Deep analysis must be a boolean' })
+  deepAnalysis?: boolean;
 }
