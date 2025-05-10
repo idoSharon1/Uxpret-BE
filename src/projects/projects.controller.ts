@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
+import { ObjectId } from 'mongoose';
 
 @Controller('projects')
 export class ProjectsController {
@@ -13,13 +14,13 @@ export class ProjectsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.projectsService.findOne(+id);
+  findOne(@Param('id') id: ObjectId) {
+    return this.projectsService.findOne(id);
   }
 
   @Delete(':id')
-  removeProject(@Param('id') id: string) {
-    return this.projectsService.remove(+id);
+  removeProject(@Param('id') id: ObjectId) {
+    return this.projectsService.remove(id);
   }
 
   @Post()

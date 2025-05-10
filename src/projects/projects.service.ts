@@ -20,7 +20,7 @@ export class ProjectsService {
     });
   }
 
-  findOne(id: number) {
+  findOne(id: ObjectId) {
     return this.projectModel.findById({ id }).exec().then((project) => {
       if (!project) {
         throw new NotFoundException(`No project found with ID "${id}"`);
