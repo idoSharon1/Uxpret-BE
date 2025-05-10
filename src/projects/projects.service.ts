@@ -1,8 +1,9 @@
+import { Model, ObjectId } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { Project, ProjectDocument } from './schemas/project.schema';
-import { Model } from 'mongoose';
 
 @Injectable()
 export class ProjectsService {
@@ -19,27 +20,38 @@ export class ProjectsService {
     });
   }
 
-  create(createProjectDto: CreateProjectDto) {
-    return 'This action adds a new project';
-  }
-
   findOne(id: number) {
     return this.projectModel.findById({ id }).exec().then((project) => {
       if (!project) {
         throw new NotFoundException(`No project found with ID "${id}"`);
       }
       return project;
-    });  }
-
-  update(id: number, updateProjectDto: UpdateProjectDto) {
-    return `This action updates a #${id} project`;
+    }); 
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} project`;
+  async create(createProjectDto: CreateProjectDto): Promise<ProjectDocument> {
+    const createdProject = new this.projectModel({
+      ...createProjectDto,
+    });
+
+    return createdProject.save();
+  }
+
+  update(id: ObjectId, updateProjectDto: UpdateProjectDto) {
+    return this.projectModel.findByIdAndUpdate(id, updateProjectDto, { new: true }).exec().then((project) => {
+      if (!project) { 
+        throw new NotFoundException(`No project found with ID "${id}"`);
+      }
+      return true;
+    });
+  }
+
+  remove(id: ObjectId) {
+    return this.projectModel.findByIdAndDelete(id).exec().then((project) => {
+      if (!project) {
+        throw new NotFoundException(`No project found with ID "${id}"`);
+      }
+      return true;
+    });
   }
 }
-function InjectModel(name: string): (target: typeof ProjectsService, propertyKey: undefined, parameterIndex: 0) => void {
-  throw new Error('Function not implemented.');
-}
-
