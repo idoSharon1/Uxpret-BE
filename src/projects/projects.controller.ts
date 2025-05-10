@@ -4,7 +4,8 @@ import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { ObjectId } from 'mongoose';
 
-@Controller('projects')
+
+@Controller('api/projects')
 export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
 
@@ -23,7 +24,7 @@ export class ProjectsController {
     return this.projectsService.remove(id);
   }
 
-  @Post()
+  @Post("/new")
   create(@Body() createProjectDto: CreateProjectDto) {
     return this.projectsService.create(createProjectDto);
   }
