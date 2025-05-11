@@ -32,6 +32,18 @@ export class ReportsService {
     return report;
   }
 
+  async getReportHistoryByProjectId(projectId: string): Promise<Report[]> {
+    console.log(`Fetching report history for website: ${projectId}`);
+    
+    const report = await this.reportModel.find({ projectId }).sort({ createdAt: -1 }).exec();
+
+    if (!report) {
+      throw new NotFoundException(`Report with the name "${projectId}" not found`);
+    }
+
+    return report;
+  }
+
   async deleteReport(id: string, userId: string): Promise<void> {
     const report = await this.reportModel.findOne({ _id: id, userId }).exec();
 
