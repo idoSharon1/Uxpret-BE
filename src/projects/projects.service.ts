@@ -36,8 +36,7 @@ export class ProjectsService {
       ...createProjectDto,
     });
 
-    await createdProject.save();
-    return true;
+    return createdProject.save();
   }
 
   update(id: ObjectId, updateProjectDto: UpdateProjectDto) {

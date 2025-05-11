@@ -10,8 +10,7 @@ import {
 
 export class AnalyzeWebsiteDto {
   
-  @ApiProperty({ description: 'Website name', required: true })
-  @IsOptional()
+  @ApiProperty({ description: 'projectId', required: true })
   @IsString({ message: 'the id of the project that the analyst results will be' })
   projectId: string;
 

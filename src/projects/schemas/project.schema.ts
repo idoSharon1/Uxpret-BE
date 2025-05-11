@@ -5,7 +5,7 @@ export type ProjectDocument = Project & Document;
 
 @Schema()
 export class Project {
-  @Prop({ type: MongooseSchema.Types.ObjectId,  required: true, auto: true })
+  @Prop({ type: MongooseSchema.Types.ObjectId, auto: true })
   projectId: string;
 
   @Prop({ required: true, type: MongooseSchema.Types.ObjectId, ref: 'User' })
