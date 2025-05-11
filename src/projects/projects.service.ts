@@ -5,13 +5,11 @@ import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { Project, ProjectDocument } from './schemas/project.schema';
 import { AnalyzeWebsiteDto } from 'src/website/dto/analyze-website.dto';
-import { WebsiteService } from 'src/website/website.service';
 
 @Injectable()
 export class ProjectsService {
  constructor(
     @InjectModel(Project.name) private projectModel: Model<ProjectDocument>,
-    private readonly websiteService: WebsiteService
   ) {}
   
   findAllUsersProjects(userId: string) {
