@@ -28,12 +28,22 @@ export class ReportsController {
   }
 
   @Get('/history/:websiteName')
-  @ApiQuery({ name: 'websiteName', required: true, description: 'Get all the reposts history of this website that the user did' })
-  async getReportHistoryByName(@Param() params: ReportHistoryParamDto, @Request() req) {
-    const userId = req.user?.userId ?? "67e92091e4ef47c4fb3809ab"; // Replace with actual user ID extraction logic
-    return this.reportsService.getReportHistoryByName(params.websiteName, userId);
+  @ApiQuery({
+    name: 'websiteName',
+    required: true,
+    description:
+      'Get all the reposts history of this website that the user did',
+  })
+  async getReportHistoryByName(
+    @Param() params: ReportHistoryParamDto,
+    @Request() req,
+  ) {
+    const userId = req.user?.userId ?? '67e92091e4ef47c4fb3809ab'; // Replace with actual user ID extraction logic
+    return this.reportsService.getReportHistoryByName(
+      params.websiteName,
+      userId,
+    );
   }
-
 
   @Delete(':id')
   @ApiQuery({ name: 'id', required: true, description: 'Delete report by id' })
@@ -50,8 +60,16 @@ export class ReportsController {
   }
 
   @Get('compare/:report1/:report2')
-  @ApiQuery({ name: 'report1', required: true, description: 'First report ID to compare' })
-  @ApiQuery({ name: 'report2', required: true, description: 'Second report ID to compare' })
+  @ApiQuery({
+    name: 'report1',
+    required: true,
+    description: 'First report ID to compare',
+  })
+  @ApiQuery({
+    name: 'report2',
+    required: true,
+    description: 'Second report ID to compare',
+  })
   async compareReports(@Query() query: ReportCompareQueryDto, @Request() req) {
     const userId = req.user.userId;
     return this.reportsService.compareReports(
