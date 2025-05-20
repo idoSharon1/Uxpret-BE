@@ -13,3 +13,9 @@ export class ReportHistoryParamDto {
   @Matches(/^[a-zA-Z0-9\s]+$/, { message: 'Invalid Website Name format' })
   readonly websiteName: string;
 }
+
+export class ReportHistoryByProjectIdParamDto {
+  @IsNotEmpty({ message: 'Website Name cannot be empty' })
+  @IsString({ message: 'Website Name must be a string' })
+  readonly projectId: string;
+}

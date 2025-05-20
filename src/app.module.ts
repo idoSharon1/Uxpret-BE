@@ -14,6 +14,7 @@ import { ReportsModule } from './reports/reports.module';
 import { WebsiteModule } from './website/website.module';
 import { DatabaseModule } from './database/database.module';
 import { AuthMiddleware } from './auth/middleware/auth.middleware';
+import { ProjectsModule } from './projects/projects.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { AuthMiddleware } from './auth/middleware/auth.middleware';
     DatabaseModule,
     AuthModule,
     UsersModule,
+    ProjectsModule,
     ReportsModule,
     WebsiteModule,
   ],

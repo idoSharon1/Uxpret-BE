@@ -59,6 +59,10 @@ export class Report {
   @Prop({ required: true, type: MongooseSchema.Types.ObjectId, ref: 'User' })
   userId: string;
 
+  // the report is of a project with this id
+  @Prop({ type: MongooseSchema.Types.ObjectId, required: true }) 
+  projectId: string;
+
   @Prop({ required: true })
   email: string;
 

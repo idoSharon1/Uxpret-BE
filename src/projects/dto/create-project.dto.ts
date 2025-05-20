@@ -1,18 +1,17 @@
+import { IsNotEmpty, IsOptional, IsMongoId, IsEmail, IsArray, IsString, IsUrl, IsBoolean } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsUrl,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  IsBoolean,
-  IsArray,
-} from 'class-validator';
+import { ObjectId } from 'mongoose';
 
-export class AnalyzeWebsiteDto {
-  
-  @ApiProperty({ description: 'projectId', required: true })
-  @IsString({ message: 'the id of the project that the analyst results will be' })
-  projectId: string;
+export class CreateProjectDto {
+  @ApiProperty({ description: 'User ID of the project creator' })
+  @IsNotEmpty()
+  @IsMongoId()
+  userId: string;
+
+  @ApiProperty({ description: 'Email of the project creator' })
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
 
   @ApiProperty({
     example: 'https://www.colman.ac.il/',
@@ -20,52 +19,59 @@ export class AnalyzeWebsiteDto {
   })
   @IsNotEmpty({ message: 'URL cannot be empty' })
   @IsUrl({}, { message: 'Invalid URL format' })
-  readonly url: string;
+  url: string;
 
-  @ApiProperty({ example: 'www.colman.ac.il', description: 'Website name' })
+  @ApiProperty({ example: 'www.colman.ac.il', description: 'Website name', required: false })
   @IsOptional()
   @IsString({ message: 'Name must be a string' })
-  readonly name: string;
+  name: string;
 
   @ApiProperty({
     example: '["Programming","Social Media"]',
     description: 'Website categories',
+    required: false
   })
   @IsOptional()
   @IsArray({ message: 'categories must be a string array' })
-  readonly categories: string[];
+  @IsString({ each: true })
+  categories: string[];
 
   @ApiProperty({
     example: '["Adults","Teens"]',
     description: 'Website audience',
+    required: false
   })
   @IsOptional()
   @IsArray({ message: 'audience must be a string array' })
-  readonly audience: string[];
+  @IsString({ each: true })
+  audience: string[];
 
   @ApiProperty({
     example: '["Professional", "Security & Trust"]',
     description: 'Website emotions',
+    required: false
   })
   @IsOptional()
   @IsArray({ message: 'emotions must be a string array' })
-  readonly emotions: string[];
+  @IsString({ each: true })
+  emotions: string[];
 
   @ApiProperty({
     example: 'Website for academic studies',
-    description: 'Website name',
+    description: 'Website purpose',
+    required: false
   })
   @IsOptional()
   @IsString({ message: 'purpose must be a string' })
-  readonly purpose: string;
+  purpose: string;
 
-  @ApiProperty({ example: 'false', description: 'to include screenshot?' })
+  @ApiProperty({ example: 'false', description: 'to include screenshot?', required: false })
   @IsOptional()
   @IsBoolean({ message: 'Include screenshots must be a boolean' })
-  readonly includeScreenshots?: boolean;
+  includeScreenshots?: boolean;
 
-  @ApiProperty({ example: 'false', description: 'to run Deep Analysis?' })
+  @ApiProperty({ example: 'false', description: 'to run Deep Analysis?', required: false })
   @IsOptional()
   @IsBoolean({ message: 'Deep analysis must be a boolean' })
-  readonly deepAnalysis?: boolean;
+  deepAnalysis?: boolean;
 }

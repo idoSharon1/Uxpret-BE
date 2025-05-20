@@ -27,6 +27,7 @@ export class WebsiteService {
 
       // 2. Create a new report entry with status "processing"
       const report = new this.reportModel({
+        projectId: analyzeWebsiteDto.projectId,
         userId,
         email: email,
         url: analyzeWebsiteDto.url,
