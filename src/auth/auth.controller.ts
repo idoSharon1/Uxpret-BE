@@ -38,9 +38,6 @@ export class AuthController {
 
     // Setting the cookie with the token
     res.cookie('access_token', access_token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'lax',
       maxAge: 24 * 60 * 60 * 1000,
     });
 
@@ -57,9 +54,6 @@ export class AuthController {
     const { access_token, user } = this.authService.login(newUser);
 
     res.cookie('access_token', access_token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'lax',
       maxAge: 24 * 60 * 60 * 1000,
     });
 
@@ -78,16 +72,10 @@ export class AuthController {
     const { access_token, user } = this.authService.googleLogin(req.user);
     // Setting the cookie with the token
     res.cookie('access_token', access_token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'lax',
       maxAge: 24 * 60 * 60 * 1000, // Cookie expires in 1 day.
     });
 
     res.cookie('user', JSON.stringify(user), {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'lax',
       maxAge: 24 * 60 * 60 * 1000, // Cookie expires in 1 day.
     });
 
