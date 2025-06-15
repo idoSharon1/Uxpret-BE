@@ -229,7 +229,7 @@ export function getWebsiteGemeniAnalysis(
                             "final_score": 0,
                             "best_thing": "...",
                             "worst_thing": "...",
-                            "suggested_mew_html": "..."
+                            "suggested_new_html": "..."
                         }
                     }
                     \n\n
