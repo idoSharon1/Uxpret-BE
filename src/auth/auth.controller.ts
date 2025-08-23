@@ -71,15 +71,17 @@ export class AuthController {
   googleAuthRedirect(@Request() req, @Res() res: Response) {
     const { access_token, user } = this.authService.googleLogin(req.user);
     // Setting the cookie with the token
-    res.cookie('access_token', access_token, {
-      maxAge: 24 * 60 * 60 * 1000, // Cookie expires in 1 day.
-    });
+    // res.cookie('access_token', access_token, {
+    //   maxAge: 24 * 60 * 60 * 1000, // Cookie expires in 1 day.
+    // });
 
-    res.cookie('user', JSON.stringify(user), {
-      maxAge: 24 * 60 * 60 * 1000, // Cookie expires in 1 day.
-    });
-
-    return res.redirect(process.env.FRONTEND_URL || 'http://localhost:3000');
+    // res.cookie('user', JSON.stringify(user), {
+    //   maxAge: 24 * 60 * 60 * 1000, // Cookie expires in 1 day.
+    // });
+    console.log(JSON.stringify(user))
+  
+    return res.redirect(`${process.env.FRONTEND_URL}?access_token=${access_token}&user=${JSON.stringify(user)}` || 
+    'http://localhost:3000?access_token=${access_token}&user=${JSON.stringify(user)}');
   }
 
   @UseGuards(JwtAuthGuard)
