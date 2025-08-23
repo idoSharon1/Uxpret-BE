@@ -1,5 +1,15 @@
 {
     "version": 2,
+    "env": {
+        "MONGODB_URI": "mongodb+srv://dbUser:dbUserPassword@cluster0.ezn6r.mongodb.net/",
+        "JWT_SECRET": "your-secret-key-change-this-in-production",
+        "GOOGLE_CLIENT_ID": "651332950325-6hvflj23o0j01mi1agm84kcvh6bicjgp.apps.googleusercontent.com",
+        "GOOGLE_CLIENT_SECRET": "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",
+        "GOOGLE_CALLBACK_URL": "https://uxpert-be.vercel.app/auth/google/callback",
+        "PORT": "3003",
+        "GEMINI_API_KEY": "AIzaSyBLP-MvHlhIw9UBl_qfupng8p9RTQmy4qk",
+        "FRONTEND_URL": "https://uxpert.vercel.app"
+    },
     "builds": [
         {
             "src": "src/main.ts",
