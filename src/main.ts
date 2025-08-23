@@ -1,45 +1,56 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
-import * as cookieParser from 'cookie-parser';
+import cookieParser from 'cookie-parser'; // ✅ fixed import
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-
 import * as dotenv from 'dotenv';
+import express from 'express';
+import { ExpressAdapter } from '@nestjs/platform-express';
 
-async function bootstrap() {
-  // Load environment variables
-  dotenv.config();
+dotenv.config();
 
-  const app = await NestFactory.create(AppModule);
+const server = express();
+
+async function createApp() {
+  const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
 
   const config = new DocumentBuilder()
     .setTitle('UXpert API')
     .setDescription('API for the UXpert frontend')
     .setVersion('1.0')
-    .addBearerAuth() // Adds JWT authentication (optional)
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document); // Swagger will be available at /api
+  SwaggerModule.setup('api', app, document);
 
-  // Enable global validation
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true, // Removes fields not defined in DTO
-      forbidNonWhitelisted: true, // Throws error if unknown fields are sent
-      transform: true, // Automatically transforms to the correct type
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
     }),
   );
 
-  // Enable cookie parser
   app.use(cookieParser());
-  // Enable CORS for frontend integration
+
   app.enableCors({
     origin: process.env.FRONTEND_URL || 'http://localhost:3000',
     credentials: true,
   });
 
-  await app.listen(process.env.PORT || 3000);
-  console.log(`Application is running on: ${await app.getUrl()}`);
+  await app.init();
+  return server;
 }
-bootstrap();
+
+// 🚀 Exported for Vercel
+export default createApp();
+
+// ✅ Still works locally with `npm run start:dev`
+if (!process.env.VERCEL) {
+  createApp().then(app =>
+    app.listen(process.env.PORT || 3000, () => {
+      console.log(`Application is running on: http://localhost:${process.env.PORT || 3000}`);
+    }),
+  );
+}
