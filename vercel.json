@@ -1,15 +1,5 @@
 {
     "version": 2,
-    "env": {
-        "MONGODB_URI": "@MONGODB_URI",
-        "JWT_SECRET": "@JWT_SECRET",
-        "GOOGLE_CLIENT_ID": "@GOOGLE_CLIENT_ID",
-        "GOOGLE_CLIENT_SECRET": "@GOOGLE_CLIENT_SECRET",
-        "GOOGLE_CALLBACK_URL": "@GOOGLE_CALLBACK_URL",
-        "PORT": "@PORT",
-        "GEMINI_API_KEY": "@GEMINI_API_KEY",
-        "FRONTEND_URL": "@FRONTEND_URL"
-    },
     "builds": [
         {
             "src": "src/main.ts",
