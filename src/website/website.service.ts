@@ -1,4 +1,3 @@
-// src/website/website.service.ts
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -18,7 +17,11 @@ export class WebsiteService {
     private usersService: UsersService,
   ) {}
 
-  async analyze(analyzeWebsiteDto: AnalyzeWebsiteDto, userId: string, email: string) {
+  async analyze(
+    analyzeWebsiteDto: AnalyzeWebsiteDto,
+    userId: string,
+    email: string,
+  ) {
     try {
       this.logger.log(`Starting analysis for URL: ${analyzeWebsiteDto.url}`);
 
@@ -43,17 +46,18 @@ export class WebsiteService {
       await report.save();
 
       // 3. Start the analysis process asynchronously
-      const results = await this.processWebsiteAnalysis(report.id, analyzeWebsiteDto).catch(
-        (error) => {
-          this.logger.error(
-            `Analysis failed for ${analyzeWebsiteDto.url}`,
-            error.stack,
-          );
-          this.updateReportStatus(report.id, 'failed', {
-            error: error.message,
-          });
-        },
-      );
+      const results = await this.processWebsiteAnalysis(
+        report.id,
+        analyzeWebsiteDto,
+      ).catch((error) => {
+        this.logger.error(
+          `Analysis failed for ${analyzeWebsiteDto.url}`,
+          error.stack,
+        );
+        this.updateReportStatus(report.id, 'failed', {
+          error: error.message,
+        });
+      });
 
       // 4. Return the report ID immediately so the client can poll for updates
       // return {
@@ -93,11 +97,8 @@ export class WebsiteService {
 
       // 4. Perform AI analysis
       // integrate with AI  service
-      const analysisResults = await this.performAiAnalysis(
-        content,
-        options,
-      );
-      
+      const analysisResults = await this.performAiAnalysis(content, options);
+
       // TDOD
       // // 5. Generate PDF report
       // const pdfUrl = await this.generatePdfReport(
@@ -107,15 +108,15 @@ export class WebsiteService {
       // );
 
       // TDOD
-      // // 6. Generate HTML file and expose it 
+      // // 6. Generate HTML file and expose it
 
       if (analysisResults == null) {
         throw new BadRequestException('AI analysis failed');
-      } else { 
+      } else {
         // 6. Update report with results
         await this.updateReportStatus(reportId, 'completed', {
           results: analysisResults.website_evaluation,
-          pdfUrl: "", //pdfUrl,
+          pdfUrl: '', //pdfUrl,
           completedAt: new Date(),
         });
         return analysisResults.website_evaluation;
@@ -133,17 +134,18 @@ export class WebsiteService {
     content: string,
     options: AnalyzeWebsiteDto,
   ): Promise<any> {
-
-    return getWebsiteGemeniAnalysis(content, options).then((response) => {
-      const res = response.candidates[0].content.parts[0].text;
-      const evaluation_json = convertApiResponse(res);
-      console.log('AI Analysis response:');
-      log({evaluation_json: evaluation_json});
-      return evaluation_json;
-    }).catch((error) => {
-      console.error('Error during AI analysis:', error);
-      return null
-    });
+    return getWebsiteGemeniAnalysis(content, options)
+      .then((response) => {
+        const res = response.candidates[0].content.parts[0].text;
+        const evaluation_json = convertApiResponse(res);
+        console.log('AI Analysis response:');
+        log({ evaluation_json: evaluation_json });
+        return evaluation_json;
+      })
+      .catch((error) => {
+        console.error('Error during AI analysis:', error);
+        return null;
+      });
   }
 
   private async updateReportStatus(
