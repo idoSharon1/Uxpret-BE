@@ -20,7 +20,11 @@ export class ProjectsService {
       return projects;
     });
   }
-
+  
+  findAll() {
+    return this.projectModel.find().exec();
+  }
+  
   findOne(id: ObjectId) {
     return this.projectModel.findById({ id }).exec().then((project) => {
       if (!project) {

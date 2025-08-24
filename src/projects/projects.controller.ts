@@ -9,6 +9,11 @@ import { ObjectId } from 'mongoose';
 export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
 
+  @Get()
+findAll() {
+  return this.projectsService.findAll();
+}
+
   @Get('users/projects/:userid')
   findAllUsersProjects(@Param('userid') userid: string) {
     return this.projectsService.findAllUsersProjects(userid);
