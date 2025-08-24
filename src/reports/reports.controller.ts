@@ -9,7 +9,11 @@ import {
 } from '@nestjs/common';
 import { ReportsService } from './reports.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { ReportHistoryByProjectIdParamDto, ReportHistoryParamDto, ReportParamDto } from './dto/report-param.dto';
+import {
+  ReportHistoryByProjectIdParamDto,
+  ReportHistoryParamDto,
+  ReportParamDto,
+} from './dto/report-param.dto';
 import { ReportHistoryQueryDto } from './dto/report-history-query.dto';
 import { ReportCompareQueryDto } from './dto/report-compare-query.dto';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
@@ -28,18 +32,36 @@ export class ReportsController {
   }
 
   @Get('/history/:websiteName')
-  @ApiQuery({ name: 'websiteName', required: true, description: 'Get all the reposts history of this website that the user did' })
-  async getReportHistoryByName(@Param() params: ReportHistoryParamDto, @Request() req) {
-    const userId = req.user?.userId ?? "67e92091e4ef47c4fb3809ab"; //TODO: Replace with actual user ID extraction logic
-    return this.reportsService.getReportHistoryByName(params.websiteName, userId);
+  @ApiQuery({
+    name: 'websiteName',
+    required: true,
+    description:
+      'Get all the reposts history of this website that the user did',
+  })
+  async getReportHistoryByName(
+    @Param() params: ReportHistoryParamDto,
+    @Request() req,
+  ) {
+    const userId = req.user?.userId ?? '67e92091e4ef47c4fb3809ab'; //TODO: Replace with actual user ID extraction logic
+    return this.reportsService.getReportHistoryByName(
+      params.websiteName,
+      userId,
+    );
   }
 
   @Get('/byProjectId/:projectId')
-  @ApiQuery({ name: 'projectId', required: true, description: 'Get all the reposts history of the project with the projectId' })
-  async getReportHistoryByProjectId(@Param() params: ReportHistoryByProjectIdParamDto, @Request() req) {
+  @ApiQuery({
+    name: 'projectId',
+    required: true,
+    description:
+      'Get all the reposts history of the project with the projectId',
+  })
+  async getReportHistoryByProjectId(
+    @Param() params: ReportHistoryByProjectIdParamDto,
+    @Request() req,
+  ) {
     return this.reportsService.getReportHistoryByProjectId(params.projectId);
   }
-
 
   @Delete(':id')
   @ApiQuery({ name: 'id', required: true, description: 'Delete report by id' })

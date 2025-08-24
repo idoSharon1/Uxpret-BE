@@ -37,8 +37,8 @@ async function createApp() {
   app.enableCors({
     origin: [
       process.env.FRONTEND_URL || 'http://localhost:3000',
-      'https://uxpert.vercel.app', 
-      'http://localhost:5173'      
+      'https://uxpert.vercel.app',
+      'http://localhost:5173',
     ],
     credentials: true,
   });
@@ -47,14 +47,14 @@ async function createApp() {
   return server;
 }
 
-// 🚀 Exported for Vercel
 export default createApp();
 
-// ✅ Still works locally with `npm run start:dev`
 if (!process.env.VERCEL) {
-  createApp().then(app =>
+  createApp().then((app) =>
     app.listen(process.env.PORT || 3000, () => {
-      console.log(`Application is running on: http://localhost:${process.env.PORT || 3000}`);
+      console.log(
+        `Application is running on: http://localhost:${process.env.PORT || 3001}`,
+      );
     }),
   );
 }
