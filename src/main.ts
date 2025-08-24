@@ -1,71 +1,45 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
-import cookieParser from 'cookie-parser'; // ✅ fixed import
+import * as cookieParser from 'cookie-parser';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+
 import * as dotenv from 'dotenv';
-import express from 'express';
-import { ExpressAdapter } from '@nestjs/platform-express';
 
-dotenv.config();
+async function bootstrap() {
+  // Load environment variables
+  dotenv.config();
 
-const server = express();
-
-server.options('*', (req, res) => {
-  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.sendStatus(204);
-});
-
-async function createApp() {
-  const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
+  const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
     .setTitle('UXpert API')
     .setDescription('API for the UXpert frontend')
     .setVersion('1.0')
-    .addBearerAuth()
+    .addBearerAuth() // Adds JWT authentication (optional)
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('api', app, document); // Swagger will be available at /api
 
+  // Enable global validation
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      transform: true,
+      whitelist: true, // Removes fields not defined in DTO
+      forbidNonWhitelisted: true, // Throws error if unknown fields are sent
+      transform: true, // Automatically transforms to the correct type
     }),
   );
 
+  // Enable cookie parser
   app.use(cookieParser());
-
+  // Enable CORS for frontend integration
   app.enableCors({
-    origin: [
-      process.env.FRONTEND_URL || 'http://localhost:3000',
-      'https://uxpert.vercel.app',
-      'http://localhost:5173',
-    ],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    exposedHeaders: ['Content-Disposition'],
+    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
     credentials: true,
   });
 
-  await app.init();
-  return server;
+  await app.listen(process.env.PORT || 3000, "0.0.0.0");
+  console.log(`Application is running on: ${await app.getUrl()}`);
 }
-
-export default createApp();
-
-if (!process.env.VERCEL) {
-  createApp().then((app) =>
-    app.listen(process.env.PORT || 3000, () => {
-      console.log(
-        `Application is running on: http://localhost:${process.env.PORT || 3001}`,
-      );
-    }),
-  );
-}
+bootstrap();
