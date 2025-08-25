@@ -1,4 +1,3 @@
-// src/website/website.controller.ts
 import { Controller, Post, Body, UseGuards, Request } from '@nestjs/common';
 import { WebsiteService } from './website.service';
 import { AnalyzeWebsiteDto } from './dto/analyze-website.dto';
@@ -18,8 +17,8 @@ export class WebsiteController {
     @Request() req,
   ) {
     // Get the user ID from the request (set by JwtAuthGuard)
-    const userId = req.user?.userId ?? "67e92091e4ef47c4fb3809ab"; // Replace with actual user ID extraction logic
-    const email = req.user?.email ?? "67e92091e4ef47c4fb3809ab"; // Replace with actual user ID extraction logic
+    const userId = req.user?.userId ?? '67e92091e4ef47c4fb3809ab';
+    const email = req.user?.email ?? '67e92091e4ef47c4fb3809ab';
     return this.websiteService.analyze(analyzeWebsiteDto, userId, email);
   }
 }

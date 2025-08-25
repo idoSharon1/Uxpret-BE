@@ -59,12 +59,6 @@ export class WebsiteService {
         });
       });
 
-      // 4. Return the report ID immediately so the client can poll for updates
-      // return {
-      //   reportId: report._id,
-      //   status: 'processing',
-      //   message: 'Analysis has been queued and will be processed shortly',
-      // };
       return results;
     } catch (error) {
       this.logger.error(
@@ -87,36 +81,15 @@ export class WebsiteService {
 
       // 2. Fetch the website content
       const content = (await fetchWebsiteContent(options.url)).toString();
-
-      // TODO
-      // // 3. Take screenshots if requested
-      // let screenshots: string[] = [];
-      // if (options.includeScreenshots) {
-      //   screenshots = await this.captureScreenshots(options.url);
-      // }
-
-      // 4. Perform AI analysis
-      // integrate with AI  service
       const analysisResults = await this.performAiAnalysis(content, options);
-
-      // TDOD
-      // // 5. Generate PDF report
-      // const pdfUrl = await this.generatePdfReport(
-      //   reportId,
-      //   analysisResults,
-      //   screenshots,
-      // );
-
-      // TDOD
-      // // 6. Generate HTML file and expose it
 
       if (analysisResults == null) {
         throw new BadRequestException('AI analysis failed');
       } else {
-        // 6. Update report with results
+        // 3. Update report with results
         await this.updateReportStatus(reportId, 'completed', {
           results: analysisResults.website_evaluation,
-          pdfUrl: '', //pdfUrl,
+          pdfUrl: '',
           completedAt: new Date(),
         });
         return analysisResults.website_evaluation;

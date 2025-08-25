@@ -42,7 +42,7 @@ export class ReportsController {
     @Param() params: ReportHistoryParamDto,
     @Request() req,
   ) {
-    const userId = req.user?.userId ?? '67e92091e4ef47c4fb3809ab'; //TODO: Replace with actual user ID extraction logic
+    const userId = req.user?.userId ?? '67e92091e4ef47c4fb3809ab';
     return this.reportsService.getReportHistoryByName(
       params.websiteName,
       userId,

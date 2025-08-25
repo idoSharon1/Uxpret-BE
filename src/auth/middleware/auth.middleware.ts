@@ -1,4 +1,3 @@
-// src/auth/middleware/auth.middleware.ts
 import {
   Injectable,
   NestMiddleware,
@@ -38,11 +37,11 @@ export class AuthMiddleware implements NestMiddleware {
       const token =
         req.headers.authorization?.split(' ')[1] || req.cookies?.access_token;
 
-      if(this.configService.get<string>('RUNNIGN_MODE') === 'development') {
+      if (this.configService.get<string>('RUNNIGN_MODE') === 'development') {
         req.user = {
-          userId: "67e92091e4ef47c4fb3809ab",
-          username: "67e92091e4ef47c4fb3809ab",
-          email: "67e92091e4ef47c4fb3809ab@gmail.com",
+          userId: '67e92091e4ef47c4fb3809ab',
+          username: '67e92091e4ef47c4fb3809ab',
+          email: '67e92091e4ef47c4fb3809ab@gmail.com',
         };
 
         next();
@@ -55,7 +54,8 @@ export class AuthMiddleware implements NestMiddleware {
       // Verify the token
       const payload = this.jwtService.verify(token, {
         secret:
-          this.configService.get<string>('JWT_SECRET') || process.env.JWT_SECRET,
+          this.configService.get<string>('JWT_SECRET') ||
+          process.env.JWT_SECRET,
       });
 
       // Check if the user exists

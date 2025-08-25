@@ -37,8 +37,6 @@ export class AppModule implements NestModule {
       .apply(AuthMiddleware)
       .exclude(
         { path: '/', method: RequestMethod.POST },
-        { path: '/api/reports/history', method: RequestMethod.GET }, //TODO delete from production
-        { path: '/api/website/analyze', method: RequestMethod.POST }, //TODO delete from production
         { path: 'auth/login', method: RequestMethod.POST },
         { path: 'auth/register', method: RequestMethod.POST },
         { path: 'auth/google', method: RequestMethod.GET },

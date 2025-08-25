@@ -1,8 +1,12 @@
-// src/reports/reports.service.ts
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { OverallEvaluation, Report, ReportDocument, WebsiteEvaluation } from './schemas/report.schema';
+import {
+  OverallEvaluation,
+  Report,
+  ReportDocument,
+  WebsiteEvaluation,
+} from './schemas/report.schema';
 
 @Injectable()
 export class ReportsService {
@@ -20,13 +24,23 @@ export class ReportsService {
     return report;
   }
 
-  async getReportHistoryByName(websiteName: string, userId: string): Promise<Report[]> {
-    console.log(`Fetching report history for website: ${websiteName}, userId: ${userId}`);
-    
-    const report = await this.reportModel.find({ name: websiteName, userId }).sort({ createdAt: -1 }).exec();
+  async getReportHistoryByName(
+    websiteName: string,
+    userId: string,
+  ): Promise<Report[]> {
+    console.log(
+      `Fetching report history for website: ${websiteName}, userId: ${userId}`,
+    );
+
+    const report = await this.reportModel
+      .find({ name: websiteName, userId })
+      .sort({ createdAt: -1 })
+      .exec();
 
     if (!report) {
-      throw new NotFoundException(`Report with the name "${websiteName}" not found`);
+      throw new NotFoundException(
+        `Report with the name "${websiteName}" not found`,
+      );
     }
 
     return report;
@@ -34,11 +48,16 @@ export class ReportsService {
 
   async getReportHistoryByProjectId(projectId: string): Promise<Report[]> {
     console.log(`Fetching report history for website: ${projectId}`);
-    
-    const report = await this.reportModel.find({ projectId }).sort({ createdAt: -1 }).exec();
+
+    const report = await this.reportModel
+      .find({ projectId })
+      .sort({ createdAt: -1 })
+      .exec();
 
     if (!report) {
-      throw new NotFoundException(`Report with the name "${projectId}" not found`);
+      throw new NotFoundException(
+        `Report with the name "${projectId}" not found`,
+      );
     }
 
     return report;
@@ -111,7 +130,10 @@ export class ReportsService {
       throw new NotFoundException(`Report with ID "${reportId2}" not found`);
     }
 
-    this.compareCategory(report1.results.category_ratings , report2.results.category_ratings)
+    this.compareCategory(
+      report1.results.category_ratings,
+      report2.results.category_ratings,
+    );
 
     return {
       report1: {
@@ -126,7 +148,10 @@ export class ReportsService {
         name: report2.name,
         results: report2.results,
       },
-      comparisons: this.compareCategory(report1.results.category_ratings , report2.results.category_ratings),
+      comparisons: this.compareCategory(
+        report1.results.category_ratings,
+        report2.results.category_ratings,
+      ),
     };
   }
 
@@ -145,24 +170,27 @@ export class ReportsService {
     };
   }
 
-  private compareCategory(report1Categories: WebsiteEvaluation[], report2Categories: WebsiteEvaluation[]): any {
+  private compareCategory(
+    report1Categories: WebsiteEvaluation[],
+    report2Categories: WebsiteEvaluation[],
+  ): any {
     if (!report1Categories || !report1Categories) {
       return { comparable: false };
     }
 
-    let results: {category: string, numeric_rating:number}[] = [];
+    const results: { category: string; numeric_rating: number }[] = [];
 
     for (const cat1 in report1Categories) {
       for (const cat2 in report2Categories) {
-        if (cat1["category"] == cat2["category"]) {
-          results[cat1["category"]] = {
-            category: cat1["category"],
-            numeric_rating: cat2["numeric_rating"] - cat1["numeric_rating"],
+        if (cat1['category'] == cat2['category']) {
+          results[cat1['category']] = {
+            category: cat1['category'],
+            numeric_rating: cat2['numeric_rating'] - cat1['numeric_rating'],
           };
         }
       }
     }
-    
-    return results
+
+    return results;
   }
 }

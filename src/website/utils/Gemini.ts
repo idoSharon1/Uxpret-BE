@@ -240,7 +240,6 @@ export function getWebsiteGemeniAnalysis(
 }
 
 export function convertApiResponse(apiResponseString: string): any | null {
-  // Remove the ```json and ``` markers
   const cleanString = apiResponseString
     .replace(/```json\n/g, '')
     .replace(/```/g, '');

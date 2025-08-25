@@ -1,4 +1,3 @@
-// src/reports/dto/report-history-query.dto.ts
 import { IsOptional, IsInt, Min, Max, IsDate, IsString } from 'class-validator';
 import { Type } from 'class-transformer';
 
